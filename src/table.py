@@ -6,7 +6,7 @@ import util
 def main():
     pygame.init()
     clock = pygame.time.Clock()
-    win_width, win_height = 640, 480 #eventually change this to be full screen size?
+    win_width, win_height = 400, 800 #eventually change this to be full screen size?
     screen = pygame.display.set_mode((win_width, win_height))
     pygame.display.set_caption("Billiards Table Simulation")
     
