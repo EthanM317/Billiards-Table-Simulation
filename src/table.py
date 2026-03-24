@@ -1,6 +1,7 @@
 import pygame, sys
 import numpy as np
 import util
+from ball import Ball
 
 
 def main():
@@ -15,19 +16,31 @@ def main():
     #text
     text = util.MyText(util.BLACK)
     
+    
+    
     #sprites
-
     wall_left = util.MyRect(util.BLUE, wall_thickness, win_height)
     wall_right = util.MyRect(util.BLUE, wall_thickness, win_height)
     wall_top = util.MyRect(util.BLUE, win_width, wall_thickness)
     wall_bottom = util.MyRect(util.BLUE, win_width, wall_thickness)
+    
+    #balls
+    #standard radius is 5.7cm, we will round to 5.5cm to match our cm->pixel scaling
+    ball1 = Ball(util.RED, 11, 11)
+    #moving ball
+    ball1.set_pos((100,100))
     
     #moving walls to correct locations
     wall_right.set_pos((win_width - (wall_thickness / 2), win_height / 2))
     wall_bottom.set_pos((win_width / 2, win_height - (wall_thickness / 2)))
 
     #grouping sprites
-    sprites_group = pygame.sprite.Group([wall_left, wall_right, wall_top, wall_bottom])
+    group_walls = pygame.sprite.Group([wall_left, wall_right, wall_top, wall_bottom])
+    #don't need to update walls since they don't move, but balls do
+    #so we will place balls in a separate group
+    group_balls = pygame.sprite.Group([ball1])
+    
+    
     
     #simulation setup code goes here
     
@@ -43,9 +56,10 @@ def main():
     
         screen.fill(util.WHITE)
         #updates sprites_group data to screen
-        #right now all sprites in group are constant so no change
-        sprites_group.update()
-        sprites_group.draw(screen)
+        #walls are constant so no update needed
+        group_walls.draw(screen)
+        group_balls.update()
+        group_balls.draw(screen)
         
         #draws rest of screen data to display
         pygame.display.flip()
