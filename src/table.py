@@ -58,7 +58,7 @@ def main():
                 for ball in group_balls:
                     if ball.is_clicked(mouse_pos):
                         ball.selected = True
-                        print("Ball clicked!")
+                        print(f"{ball.color} Ball clicked!")
         screen.fill(util.WHITE)
         #updates sprites_group data to screen
         #walls are constant so no update needed
