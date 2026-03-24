@@ -52,12 +52,18 @@ def main():
                 pygame.quit()
                 sys.exit(0)
             # other keypress events go here
-        #Update ball positions here
-    
+            elif event.type == pygame.MOUSEBUTTONUP:
+                mouse_pos = pygame.mouse.get_pos()
+                #check each ball to see if they were clicked
+                for ball in group_balls:
+                    if ball.is_clicked(mouse_pos):
+                        ball.selected = True
+                        print("Ball clicked!")
         screen.fill(util.WHITE)
         #updates sprites_group data to screen
         #walls are constant so no update needed
         group_walls.draw(screen)
+        #Update ball positions here
         group_balls.update()
         group_balls.draw(screen)
         
