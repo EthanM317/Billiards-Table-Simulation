@@ -6,7 +6,9 @@ import util
 def main():
     pygame.init()
     clock = pygame.time.Clock()
-    win_width, win_height = 400, 800 #eventually change this to be full screen size?
+    #Standard billiards table is 244cm x 122cm (each pixel is 0.5 cm)
+    wall_thickness = 30
+    win_width, win_height = 244 + wall_thickness, 488 + wall_thickness 
     screen = pygame.display.set_mode((win_width, win_height))
     pygame.display.set_caption("Billiards Table Simulation")
     
@@ -14,7 +16,7 @@ def main():
     text = util.MyText(util.BLACK)
     
     #sprites
-    wall_thickness = 30
+
     wall_left = util.MyRect(util.BLUE, wall_thickness, win_height)
     wall_right = util.MyRect(util.BLUE, wall_thickness, win_height)
     wall_top = util.MyRect(util.BLUE, win_width, wall_thickness)
