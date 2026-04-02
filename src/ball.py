@@ -5,5 +5,6 @@ class Ball(util.MyCircle):
         super().__init__(color, width, height)
         self.selected = False
         self.color = color
+        
     def is_clicked(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)

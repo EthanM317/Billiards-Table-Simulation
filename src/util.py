@@ -10,9 +10,12 @@ import pygame
 # set up the colors
 BLACK = (0, 0, 0, 255)
 WHITE = (255, 255, 255, 0)
-RED = (255, 0, 0, 255)
-GREEN = (0, 255, 0, 255)
-BLUE = (0, 0, 255, 255)
+RED = (255, 0, 0, 255) #ball colour 1
+BLUE = (0, 0, 255, 255) #ball colour 2
+GREEN = (0, 255, 0, 255) #selected ball colour
+
+
+
 
 def load_image(name):
     image = pygame.image.load(name)
@@ -22,11 +25,14 @@ class MyCircle(pygame.sprite.Sprite):
     def __init__(self, color, width, height, alpha=255):
         pygame.sprite.Sprite.__init__(self)
 
+        #need to keep track of size & location data so we can re-draw in same spot when needed
+        self.width = width
+        self.height = height
         self.image = pygame.Surface([width, height], flags=pygame.SRCALPHA)
         self.rect = self.image.get_rect()
-        cx = self.rect.centerx
-        cy = self.rect.centery
-        pygame.draw.circle(self.image, color, (width/2, height/2), cx, cy)
+        self.cx = self.rect.centerx
+        self.cy = self.rect.centery
+        pygame.draw.circle(self.image, color, (width/2, height/2), self.cx, self.cy)
 #        self.rect = self.image.get_rect()
 
         self.picked = False
@@ -37,6 +43,10 @@ class MyCircle(pygame.sprite.Sprite):
 
     def update(self):
         pass
+    
+    def setColor(self, newColor):
+        self.color = newColor
+        pygame.draw.circle(self.image, newColor, (self.width/2, self.height/2), self.cx, self.cy)
 
 class MyRect(pygame.sprite.Sprite):
     def __init__(self, color, width, height, alpha=255):

@@ -58,6 +58,7 @@ def main():
                 for ball in group_balls:
                     if ball.is_clicked(mouse_pos):
                         ball.selected = True
+                        ball.setColor(util.GREEN)
                         print(f"{ball.color} Ball clicked!")
         screen.fill(util.WHITE)
         #updates sprites_group data to screen
