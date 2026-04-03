@@ -44,6 +44,10 @@ def main():
     
     #simulation setup code goes here
     
+    
+    #flags
+    drawing_cue = False
+    
     #keypress events
     while True:
         clock.tick(60)
@@ -60,6 +64,13 @@ def main():
                         ball.selected = True
                         ball.setColor(util.GREEN)
                         print(f"{ball.color} Ball clicked!")
+                        
+                        #drawing cue
+                        drawing_cue = True
+    
+                      
+                        
+                        
         screen.fill(util.WHITE)
         #updates sprites_group data to screen
         #walls are constant so no update needed
@@ -67,6 +78,14 @@ def main():
         #Update ball positions here
         group_balls.update()
         group_balls.draw(screen)
+        
+        #Draw cue stick if a ball is selected
+        if drawing_cue:
+            mouse_pos = pygame.mouse.get_pos()
+            for ball in group_balls:
+                if ball.selected:
+                    ball.draw_cue(screen, mouse_pos)
+                    break  #only one ball is selected at a time, so only one cue drawn
         
         #draws rest of screen data to display
         pygame.display.flip()

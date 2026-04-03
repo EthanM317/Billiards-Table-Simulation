@@ -13,7 +13,7 @@ WHITE = (255, 255, 255, 0)
 RED = (255, 0, 0, 255) #ball colour 1
 BLUE = (0, 0, 255, 255) #ball colour 2
 GREEN = (0, 255, 0, 255) #selected ball colour
-
+BROWN = (139, 69, 19) #pool cue colour
 
 
 
@@ -32,7 +32,7 @@ class MyCircle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.cx = self.rect.centerx
         self.cy = self.rect.centery
-        pygame.draw.circle(self.image, color, (width/2, height/2), self.cx, self.cy)
+        pygame.draw.circle(self.image, color, (self.cx, self.cy), self.width/2)
 #        self.rect = self.image.get_rect()
 
         self.picked = False
@@ -40,14 +40,22 @@ class MyCircle(pygame.sprite.Sprite):
     def set_pos(self, pos):
         self.rect.x = pos[0] - self.rect.width//2
         self.rect.y = pos[1] - self.rect.height//2
+        
+        self.cx = self.rect.centerx
+        self.cy = self.rect.centery
 
     def update(self):
         pass
     
     def setColor(self, newColor):
+        print("setting colour")
         self.color = newColor
-        pygame.draw.circle(self.image, newColor, (self.width/2, self.height/2), self.cx, self.cy)
-
+        print("drawing new circle")
+        self.image.fill((0, 0, 0, 0))  # Clear the surface
+        pygame.draw.circle(self.image, newColor, (self.width/2, self.height/2), self.width/2)
+        print(f"ball is now {self.color}")
+ 
+    
 class MyRect(pygame.sprite.Sprite):
     def __init__(self, color, width, height, alpha=255):
         pygame.sprite.Sprite.__init__(self)
