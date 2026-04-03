@@ -48,12 +48,9 @@ class MyCircle(pygame.sprite.Sprite):
         pass
     
     def setColor(self, newColor):
-        print("setting colour")
         self.color = newColor
-        print("drawing new circle")
         self.image.fill((0, 0, 0, 0))  # Clear the surface
         pygame.draw.circle(self.image, newColor, (self.width/2, self.height/2), self.width/2)
-        print(f"ball is now {self.color}")
  
     
 class MyRect(pygame.sprite.Sprite):

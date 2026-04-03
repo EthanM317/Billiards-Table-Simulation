@@ -84,7 +84,7 @@ def main():
             mouse_pos = pygame.mouse.get_pos()
             for ball in group_balls:
                 if ball.selected:
-                    ball.draw_cue(screen, mouse_pos)
+                    power = ball.draw_cue(screen, mouse_pos)
                     break  #only one ball is selected at a time, so only one cue drawn
         
         #draws rest of screen data to display
