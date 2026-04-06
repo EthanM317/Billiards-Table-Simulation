@@ -2,95 +2,88 @@ import util
 import pygame
 import math
 import numpy as np
+
 class Ball(util.MyCircle):
     def __init__(self, color, width, height):
         super().__init__(color, width, height)
         self.selected = False
-        self.color = color
+        self.color    = color
+        self.radius   = width / 2   # needed for collision detection
 
-        
-        #simulation variables
+        # simulation variables
         self.m = 1.0
-        self.c = 0.01
+        self.c = 8.0    # rolling friction — scaled to game units (px/step, dt=0.01)
         self.state = np.zeros(4)
         self.state[0], self.state[1] = self.rect.x, self.rect.y
         self.cur_time = 0.0
         self.dt = 0.01
-        self.m = 1.0
-        self.c = 0.01
-        self.cur_time = 0.0
 
-   
-    #simulation functions
+    # ── physics ────────────────────────────────────────────────────────────────
+
     def derivatives(self, state):
         x, y, vx, vy = state
-        
-        v = np.array([vx, vy])
+        v     = np.array([vx, vy])
         speed = np.linalg.norm(v)
-        
-        if speed > 1e-6: #checks if ball is actually moving
+        if speed > 1e-6:
             ax, ay = -self.c * 9.8 * v / speed
         else:
-            ax, ay = 0, 0
-            
+            ax, ay = 0.0, 0.0
         return np.array([vx, vy, ax, ay])
 
-
     def rk4_step(self):
-
         k1 = self.derivatives(self.state)
-        k2 = self.derivatives(self.state + self.dt*k1/2)
-        k3 = self.derivatives(self.state + self.dt*k2/2)
-        k4 = self.derivatives(self.state + self.dt*k3)
+        k2 = self.derivatives(self.state + self.dt * k1 / 2)
+        k3 = self.derivatives(self.state + self.dt * k2 / 2)
+        k4 = self.derivatives(self.state + self.dt * k3)
 
-        new_state = self.state + self.dt*(k1 + 2*k2 + 2*k3 + k4)/6
+        new_state = self.state + self.dt * (k1 + 2*k2 + 2*k3 + k4) / 6
 
-        #stops ball from rolling backwards (velocity reversal)
+        # prevent velocity reversal due to friction overshoot
         if np.dot(self.state[2:4], new_state[2:4]) < 0:
-            new_state[2] = 0
-            new_state[3] = 0
+            new_state[2] = 0.0
+            new_state[3] = 0.0
 
         self.state = new_state
-        #ensures that ball stops moving eventually
-        if np.linalg.norm(self.state[2:4]) < 0.01: 
-            self.state[2] = 0
-            self.state[3] = 0
+
+        # hard stop below threshold so balls don't crawl forever
+        if np.linalg.norm(self.state[2:4]) < 3.0:
+            self.state[2] = 0.0
+            self.state[3] = 0.0
 
     def update(self):
         self.rk4_step()
-
-        self.x, self.y, self.vx, self.vy = self.state
-
-        self.rect.x = self.x
-        self.rect.y = self.y
-
-        self.cur_time += self.dt
-        
-        
-        
-        
-        
-    #graphical object functions
-    def set_pos(self, pos):
-        self.rect.x = pos[0] - self.rect.width//2
-        self.rect.y = pos[1] - self.rect.height//2
+        self.rect.x = int(self.state[0])
+        self.rect.y = int(self.state[1])
         self.cx = self.rect.centerx
         self.cy = self.rect.centery
-        #need to update state
-        self.state[0], self.state[1] = self.rect.x, self.rect.y
+        self.cur_time += self.dt
 
-     
+    def is_moving(self):
+        return np.linalg.norm(self.state[2:4]) > 3.0
+
+    # ── graphical / interaction ─────────────────────────────────────────────────
+
+    def set_pos(self, pos):
+        self.rect.x = pos[0] - self.rect.width  // 2
+        self.rect.y = pos[1] - self.rect.height // 2
+        self.cx = self.rect.centerx
+        self.cy = self.rect.centery
+        self.state[0], self.state[1] = float(self.rect.x), float(self.rect.y)
+
     def is_clicked(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
-    
+
     def draw_cue(self, screen, mouse_pos):
-        cue = pygame.draw.line(screen, util.BROWN, (self.cx, self.cy), mouse_pos, 3)
-        
-        #want to return length of cue so that we can convert it to a "power" value
-        #length = math.sqrt(self.cue.width**2 + self.cue.height**2)
-        return cue.width, cue.height
-    
-    def is_shot(self, pow_x, pow_y, ball_x, ball_y, mouse_pos):
-        vx = pow_x * ((ball_x-mouse_pos[0]) / abs(ball_x-mouse_pos[0]))
-        vy = pow_y * ((ball_y-mouse_pos[1]) / abs(ball_y-mouse_pos[1]))
-        self.state[2], self.state[3] = vx, vy
+        """Draw the aiming line from ball centre to mouse."""
+        pygame.draw.line(screen, util.BROWN, (self.cx, self.cy), mouse_pos, 3)
+
+    def is_shot(self, mouse_pos):
+        """Launch ball away from mouse_pos; power scales with distance (capped)."""
+        dx = self.cx - mouse_pos[0]
+        dy = self.cy - mouse_pos[1]
+        dist = math.sqrt(dx * dx + dy * dy)
+        if dist < 1:
+            return
+        power = min(dist * 4.80, 720.0)
+        self.state[2] = power * dx / dist
+        self.state[3] = power * dy / dist
