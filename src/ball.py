@@ -7,7 +7,7 @@ class Ball(util.MyCircle):
         super().__init__(color, width, height)
         self.selected = False
         self.color = color
-        self.cue = None
+
         
         #simulation variables
         self.m = 1.0
@@ -20,14 +20,7 @@ class Ball(util.MyCircle):
         self.c = 0.01
         self.cur_time = 0.0
 
-    def set_pos(self, pos):
-        self.rect.x = pos[0] - self.rect.width//2
-        self.rect.y = pos[1] - self.rect.height//2
-        self.cx = self.rect.centerx
-        self.cy = self.rect.centery
-        #need to update state
-        self.state[0], self.state[1] = self.rect.x, self.rect.y
-
+   
     #simulation functions
     def derivatives(self, state):
         x, y, vx, vy = state
@@ -78,15 +71,26 @@ class Ball(util.MyCircle):
         
         
     #graphical object functions
+    def set_pos(self, pos):
+        self.rect.x = pos[0] - self.rect.width//2
+        self.rect.y = pos[1] - self.rect.height//2
+        self.cx = self.rect.centerx
+        self.cy = self.rect.centery
+        #need to update state
+        self.state[0], self.state[1] = self.rect.x, self.rect.y
+
+     
     def is_clicked(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
     
     def draw_cue(self, screen, mouse_pos):
-        self.cue = pygame.draw.line(screen, util.BROWN, (self.cx, self.cy), mouse_pos, 3)
+        cue = pygame.draw.line(screen, util.BROWN, (self.cx, self.cy), mouse_pos, 3)
         
         #want to return length of cue so that we can convert it to a "power" value
-        length = math.sqrt(self.cue.width**2 + self.cue.height**2)
-        return length
+        #length = math.sqrt(self.cue.width**2 + self.cue.height**2)
+        return cue.width, cue.height
     
-    def is_shot(self, power):
-        self.init(np.array([self.x, self.y, _, _]))
+    def is_shot(self, pow_x, pow_y, ball_x, ball_y, mouse_pos):
+        vx = pow_x * ((ball_x-mouse_pos[0]) / abs(ball_x-mouse_pos[0]))
+        vy = pow_y * ((ball_y-mouse_pos[1]) / abs(ball_y-mouse_pos[1]))
+        self.state[2], self.state[3] = vx, vy
