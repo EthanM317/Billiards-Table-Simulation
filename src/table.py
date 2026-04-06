@@ -51,6 +51,16 @@ def main():
     #keypress events
     while True:
         clock.tick(60)
+        
+        screen.fill(util.WHITE)
+        #updates sprites_group data to screen
+        #walls are constant so no update needed
+        group_walls.draw(screen)
+        #Update ball positions here
+        group_balls.update()
+        
+        
+        group_balls.draw(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -64,21 +74,9 @@ def main():
                         ball.selected = True
                         ball.setColor(util.GREEN)
                         print(f"{ball.color} Ball clicked!")
-                        
                         #drawing cue
                         drawing_cue = True
-    
-                      
                         
-                        
-        screen.fill(util.WHITE)
-        #updates sprites_group data to screen
-        #walls are constant so no update needed
-        group_walls.draw(screen)
-        #Update ball positions here
-        group_balls.update()
-        group_balls.draw(screen)
-        
         #Draw cue stick if a ball is selected
         if drawing_cue:
             mouse_pos = pygame.mouse.get_pos()
@@ -87,6 +85,7 @@ def main():
                     pow_x, pow_y = ball.draw_cue(screen, mouse_pos)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         ball.is_shot(pow_x, pow_y, ball.state[0], ball.state[1], mouse_pos)
+                        drawing_cue = False
                     break  #only one ball is selected at a time, so only one cue drawn
                 
         #draws rest of screen data to display
