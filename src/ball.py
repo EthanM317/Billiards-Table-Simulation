@@ -3,7 +3,7 @@ import pygame
 import math
 import numpy as np
 class Ball(util.MyCircle):
-    def __init__(self, color, width, height, state):
+    def __init__(self, color, width, height):
         super().__init__(color, width, height)
         self.selected = False
         self.color = color
@@ -13,18 +13,22 @@ class Ball(util.MyCircle):
         self.m = 1.0
         self.c = 0.01
         self.state = np.zeros(4)
+        self.state[0], self.state[1] = self.rect.x, self.rect.y
         self.cur_time = 0.0
         self.dt = 0.01
         self.m = 1.0
         self.c = 0.01
         self.cur_time = 0.0
 
+    def set_pos(self, pos):
+        self.rect.x = pos[0] - self.rect.width//2
+        self.rect.y = pos[1] - self.rect.height//2
+        self.cx = self.rect.centerx
+        self.cy = self.rect.centery
+        #need to update state
+        self.state[0], self.state[1] = self.rect.x, self.rect.y
+
     #simulation functions
-    def init(self, state): 
-        self.state = np.array(state, dtype=float) 
-        self.x, self.y, self.vx, self.vy = self.state 
-        self.cur_time = 0.0
-    
     def derivatives(self, state):
         x, y, vx, vy = state
         
